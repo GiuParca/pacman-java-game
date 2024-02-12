@@ -10,6 +10,7 @@ import org.academiadecodigo.simplegraphics.keyboard.KeyboardHandler;
 public class RectagleObject extends GameObjects {
 
     private Rectangle rectangle;
+    int lastMove;
 
 
 

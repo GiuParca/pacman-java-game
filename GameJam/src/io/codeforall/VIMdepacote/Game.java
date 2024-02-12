@@ -7,14 +7,18 @@ import org.academiadecodigo.simplegraphics.keyboard.KeyboardEvent;
 import org.academiadecodigo.simplegraphics.keyboard.KeyboardEventType;
 import org.academiadecodigo.simplegraphics.keyboard.KeyboardHandler;
 
+import java.lang.reflect.Array;
+import java.util.Arrays;
+
 public class Game implements KeyboardHandler {
     private Boolean[] arrayCD;
     private boolean canMove;
     private Ball[] balls = new Ball[441];
     private int ballsRemaining;
     private Text scoreText;
-    RectagleObject ghost = new RectagleObject(150, 25, 30, 30);
 
+    private RectagleObject[] ghosts = new RectagleObject[4];
+    RectagleObject[] ghostMoveCheckers = new RectagleObject[4];
     RectagleObject[] gameObjects;
     //Picture pacman = new Picture(25, 25, "src/pacman-png-25195.png");
     RectagleObject playerRectangle = new RectagleObject(25, 25, 30, 30);
@@ -36,11 +40,112 @@ public class Game implements KeyboardHandler {
 
     }
 
-    public void start() {
+    public void startGhost() throws InterruptedException {
+
+
         while (true) {
+            for (int i = 0; i < ghosts.length; i++) {
+                int[] directionsPossible = new int[3];
+                for (int j = 0; j < ghosts.length - 1; j++) {
+
+                    if (j != ghosts[j].lastMove) {
+                        directionsPossible[j] = j;
+                    }
+
+                }
+                System.out.println(Arrays.toString(directionsPossible));
+
+                int direction = 0;
+                double rdn = Math.random();
+                System.out.println(rdn);
+
+                if (rdn > 0.66) {
+                    direction = directionsPossible[0];
+                    System.out.println(direction);
+                } else if (rdn > 0.33) {
+                    direction = directionsPossible[1];
+                    System.out.println(direction);
+                } else {
+                    direction = directionsPossible[2];
+                    System.out.println(direction);
+
+                }
 
 
+                switch (direction) {
+                    case 0:
+                        //for (int i = 0; i < 7; i++) {
+                        ghostMoveCheckers[i].getRectangle().translate(5, 0);
+                        ghostMoveCheckers[i].setObjectBounds(ghostMoveCheckers[i].getRectangle().getX() + ghostMoveCheckers[i].getRectangle().getWidth(), ghostMoveCheckers[i].getRectangle().getY(), ghostMoveCheckers[i].getRectangle().getX(), ghostMoveCheckers[i].getRectangle().getY() + ghostMoveCheckers[i].getRectangle().getHeight());
+                        if (cD(ghostMoveCheckers[i])) {
+                            ghosts[i].getRectangle().translate(35, 0);
+                            ghostMoveCheckers[i].getRectangle().translate(30, 0);
+                            ghosts[i].setObjectBounds(ghosts[i].getRectangle().getX() + ghosts[i].getRectangle().getWidth(), ghosts[i].getRectangle().getY(), ghosts[i].getRectangle().getX(), ghosts[i].getRectangle().getY() + ghosts[i].getRectangle().getHeight());
+                            ghosts[i].lastMove = 0;
+                        } else {
+                            ghostMoveCheckers[i].getRectangle().translate(-5, 0);
+                            ghostMoveCheckers[i].setObjectBounds(ghostMoveCheckers[i].getRectangle().getX() + ghostMoveCheckers[i].getRectangle().getWidth(), ghostMoveCheckers[i].getRectangle().getY(), ghostMoveCheckers[i].getRectangle().getX(), ghostMoveCheckers[i].getRectangle().getY() + ghostMoveCheckers[i].getRectangle().getHeight());
+                        }
+
+                        //}
+                        break;
+
+                    case 1:
+                        //for (int i = 0; i < 7; i++) {
+                        ghostMoveCheckers[i].getRectangle().translate(-5, 0);
+                        ghostMoveCheckers[i].setObjectBounds(ghostMoveCheckers[i].getRectangle().getX() + ghostMoveCheckers[i].getRectangle().getWidth(), ghostMoveCheckers[i].getRectangle().getY(), ghostMoveCheckers[i].getRectangle().getX(), ghostMoveCheckers[i].getRectangle().getY() + ghostMoveCheckers[i].getRectangle().getHeight());
+                        if (cD(ghostMoveCheckers[i])) {
+                            ghosts[i].getRectangle().translate(-35, 0);
+                            ghostMoveCheckers[i].getRectangle().translate(-30, 0);
+                            ghosts[i].setObjectBounds(ghosts[i].getRectangle().getX() + ghosts[i].getRectangle().getWidth(), ghosts[i].getRectangle().getY(), ghosts[i].getRectangle().getX(), ghosts[i].getRectangle().getY() + ghosts[i].getRectangle().getHeight());
+                            ghosts[i].lastMove = 1;
+                        } else {
+                            ghostMoveCheckers[i].getRectangle().translate(5, 0);
+                            ghostMoveCheckers[i].setObjectBounds(ghostMoveCheckers[i].getRectangle().getX() + ghostMoveCheckers[i].getRectangle().getWidth(), ghostMoveCheckers[i].getRectangle().getY(), ghostMoveCheckers[i].getRectangle().getX(), ghostMoveCheckers[i].getRectangle().getY() + ghostMoveCheckers[i].getRectangle().getHeight());
+
+                        }
+
+                        //}
+                        break;
+                    case 2:
+                        //for (int i = 0; i < 7; i++) {
+                        ghostMoveCheckers[i].getRectangle().translate(0, -5);
+                        ghostMoveCheckers[i].setObjectBounds(ghostMoveCheckers[i].getRectangle().getX() + ghostMoveCheckers[i].getRectangle().getWidth(), ghostMoveCheckers[i].getRectangle().getY(), ghostMoveCheckers[i].getRectangle().getX(), ghostMoveCheckers[i].getRectangle().getY() + ghostMoveCheckers[i].getRectangle().getHeight());
+                        if (cD(ghostMoveCheckers[i])) {
+                            ghosts[i].getRectangle().translate(0, -35);
+                            ghostMoveCheckers[i].getRectangle().translate(0, -30);
+                            ghosts[i].setObjectBounds(ghosts[i].getRectangle().getX() + ghosts[i].getRectangle().getWidth(), ghosts[i].getRectangle().getY(), ghosts[i].getRectangle().getX(), ghosts[i].getRectangle().getY() + ghosts[i].getRectangle().getHeight());
+                            ghosts[i].lastMove = 2;
+                        } else {
+                            ghostMoveCheckers[i].getRectangle().translate(0, 5);
+                            ghostMoveCheckers[i].setObjectBounds(ghostMoveCheckers[i].getRectangle().getX() + ghostMoveCheckers[i].getRectangle().getWidth(), ghostMoveCheckers[i].getRectangle().getY(), ghostMoveCheckers[i].getRectangle().getX(), ghostMoveCheckers[i].getRectangle().getY() + ghostMoveCheckers[i].getRectangle().getHeight());
+
+                        }
+
+                        // }
+                        break;
+                    case 3:
+                        //for (int i = 0; i < 7; i++) {
+                        ghostMoveCheckers[i].getRectangle().translate(0, 5);
+                        ghostMoveCheckers[i].setObjectBounds(ghostMoveCheckers[i].getRectangle().getX() + ghostMoveCheckers[i].getRectangle().getWidth(), ghostMoveCheckers[i].getRectangle().getY(), ghostMoveCheckers[i].getRectangle().getX(), ghostMoveCheckers[i].getRectangle().getY() + ghostMoveCheckers[i].getRectangle().getHeight());
+                        if (cD(ghostMoveCheckers[i])) {
+                            ghosts[i].getRectangle().translate(0, 35);
+                            ghostMoveCheckers[i].getRectangle().translate(0, 30);
+                            ghosts[i].setObjectBounds(ghosts[i].getRectangle().getX() + ghosts[i].getRectangle().getWidth(), ghosts[i].getRectangle().getY(), ghosts[i].getRectangle().getX(), ghosts[i].getRectangle().getY() + ghosts[i].getRectangle().getHeight());
+                            ghosts[i].lastMove = 3;
+                        } else {
+                            ghostMoveCheckers[i].getRectangle().translate(0, -5);
+                            ghostMoveCheckers[i].setObjectBounds(ghostMoveCheckers[i].getRectangle().getX() + ghostMoveCheckers[i].getRectangle().getWidth(), ghostMoveCheckers[i].getRectangle().getY(), ghostMoveCheckers[i].getRectangle().getX(), ghostMoveCheckers[i].getRectangle().getY() + ghostMoveCheckers[i].getRectangle().getHeight());
+
+                        }
+
+                        //}
+                        break;
+                }
+            }
+            Thread.sleep(350);
         }
+
     }
 
     public boolean cD(GameObjects object) {
@@ -81,6 +186,23 @@ public class Game implements KeyboardHandler {
         keyboard.addEventListener(leftArrow);
         keyboard.addEventListener(upArrow);
         keyboard.addEventListener(downArrow);
+
+    }
+
+    public Color randomColor() {
+        int rdn = (int) Math.round(Math.random() * 4);
+        switch (rdn) {
+            case 1:
+                return Color.CYAN;
+            case 2:
+                return Color.GRAY;
+            case 3:
+                return Color.GREEN;
+            case 4:
+                return Color.MAGENTA;
+            default:
+                return Color.PINK;
+        }
 
     }
 
@@ -144,7 +266,19 @@ public class Game implements KeyboardHandler {
             gameObjects[i].fill();
 
         }
+        for (int i = 0; i < ghostMoveCheckers.length; i++) {
+            ghostMoveCheckers[i] = new RectagleObject(375, 340, 30, 30);
 
+
+        }
+        for (int i = 0; i < ghosts.length; i++) {
+
+            ghosts[i] = new RectagleObject(375, 340, 30, 30);
+
+            ghosts[i].setColor(randomColor());
+            ghosts[i].fill();
+
+        }
         scoreText = new Text(60, 345, String.valueOf(ballsRemaining));
         scoreText.setColor(Color.BLACK);
         scoreText.grow(30, 30);
