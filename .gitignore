@@ -1,5 +1,5 @@
 # Compiled class file
-*.class
+# *.class
 
 # Log file
 *.log
@@ -11,7 +11,7 @@
 .mtj.tmp/
 
 # Package Files #
-*.jar
+# *.jar
 *.war
 *.nar
 *.ear
@@ -23,6 +23,6 @@
 hs_err_pid*
 replay_pid*
 
-.idea/
+# .idea/
 
 .DS_Store
