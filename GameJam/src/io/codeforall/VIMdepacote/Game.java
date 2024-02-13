@@ -9,16 +9,20 @@ import org.academiadecodigo.simplegraphics.keyboard.KeyboardHandler;
 
 import java.lang.reflect.Array;
 import java.util.Arrays;
-MYCHANGE
+import java.util.Collections;
+import java.util.LinkedList;
+
 public class Game implements KeyboardHandler {
     private Boolean[] arrayCD;
     private boolean canMove;
     private Ball[] balls = new Ball[441];
     private int ballsRemaining;
     private Text scoreText;
+    private boolean isGameOver;
+    private int currentKey = -1;
 
-    private RectagleObject[] ghosts = new RectagleObject[4];
-    RectagleObject[] ghostMoveCheckers = new RectagleObject[4];
+    private RectagleObject[] ghosts = new RectagleObject[6];
+    RectagleObject[] ghostMoveCheckers = new RectagleObject[6];
     RectagleObject[] gameObjects;
     //Picture pacman = new Picture(25, 25, "src/pacman-png-25195.png");
     RectagleObject playerRectangle = new RectagleObject(25, 25, 30, 30);
@@ -40,108 +44,258 @@ public class Game implements KeyboardHandler {
 
     }
 
-    public void startGhost() throws InterruptedException {
+    public void moveGhost(int direction, int ghostIndex) {
+        switch (direction) {
+            case 0:
+                //for (int i = 0; i < 7; i++) {
+                ghosts[ghostIndex].getRectangle().translate(35, 0);
+                ghostMoveCheckers[ghostIndex].getRectangle().translate(35, 0);
+                ghosts[ghostIndex].setObjectBounds(ghosts[ghostIndex].getRectangle().getX() + ghosts[ghostIndex].getRectangle().getWidth(), ghosts[ghostIndex].getRectangle().getY(), ghosts[ghostIndex].getRectangle().getX(), ghosts[ghostIndex].getRectangle().getY() + ghosts[ghostIndex].getRectangle().getHeight());
+                //}
+                break;
 
+            case 1:
+                //for (int i = 0; i < 7; i++) {
+                ghosts[ghostIndex].getRectangle().translate(-35, 0);
+                ghostMoveCheckers[ghostIndex].getRectangle().translate(-35, 0);
+                ghosts[ghostIndex].setObjectBounds(ghosts[ghostIndex].getRectangle().getX() + ghosts[ghostIndex].getRectangle().getWidth(), ghosts[ghostIndex].getRectangle().getY(), ghosts[ghostIndex].getRectangle().getX(), ghosts[ghostIndex].getRectangle().getY() + ghosts[ghostIndex].getRectangle().getHeight());
+                //}
+                break;
+            case 2:
+                //for (int i = 0; i < 7; i++) {
+                ghosts[ghostIndex].getRectangle().translate(0, -35);
+                ghostMoveCheckers[ghostIndex].getRectangle().translate(0, -35);
+                ghosts[ghostIndex].setObjectBounds(ghosts[ghostIndex].getRectangle().getX() + ghosts[ghostIndex].getRectangle().getWidth(), ghosts[ghostIndex].getRectangle().getY(), ghosts[ghostIndex].getRectangle().getX(), ghosts[ghostIndex].getRectangle().getY() + ghosts[ghostIndex].getRectangle().getHeight());
+                break;
+            case 3:
+                //for (int i = 0; i < 7; i++) {
+                ghosts[ghostIndex].getRectangle().translate(0, 35);
+                ghostMoveCheckers[ghostIndex].getRectangle().translate(0, 35);
+                ghosts[ghostIndex].setObjectBounds(ghosts[ghostIndex].getRectangle().getX() + ghosts[ghostIndex].getRectangle().getWidth(), ghosts[ghostIndex].getRectangle().getY(), ghosts[ghostIndex].getRectangle().getX(), ghosts[ghostIndex].getRectangle().getY() + ghosts[ghostIndex].getRectangle().getHeight());
+                break;
+        }
+    }
 
-        while (true) {
-            for (int i = 0; i < ghosts.length; i++) {
-                int[] directionsPossible = new int[3];
-                for (int j = 0; j < ghosts.length - 1; j++) {
+    public void movePlayer(int direction) {
+        switch (direction) {
+            case 0:
+                //for (int i = 0; i < 7; i++) {
+                moveChecker.getRectangle().translate(5, 0);
+                moveChecker.setObjectBounds(moveChecker.getRectangle().getX() + moveChecker.getRectangle().getWidth(), moveChecker.getRectangle().getY(), moveChecker.getRectangle().getX(), moveChecker.getRectangle().getY() + moveChecker.getRectangle().getHeight());
+                if (cD(moveChecker)) {
+                    playerRectangle.getRectangle().translate(35, 0);
+                    moveChecker.getRectangle().translate(30, 0);
+                    playerRectangle.setObjectBounds(playerRectangle.getRectangle().getX() + playerRectangle.getRectangle().getWidth(), playerRectangle.getRectangle().getY(), playerRectangle.getRectangle().getX(), playerRectangle.getRectangle().getY() + playerRectangle.getRectangle().getHeight());
+                    for (Ball ball : balls) {
+                        if (!ball.isEaten() && CollisionDetector.collisionDetector(playerRectangle, ball)) {
+                            ball.delete();
+                            ball.setEaten(true);
+                            ballsRemaining--;
+                            scoreText.setText(String.valueOf(ballsRemaining));
+                        }
+                    }
+                    for (RectagleObject ghost : ghosts) {
+                        if (CollisionDetector.collisionDetector(ghost, playerRectangle)) {
+                            isGameOver = true;
+                        }
 
-                    if (j != ghosts[j].lastMove) {
-                        directionsPossible[j] = j;
+                    }
+                } else {
+                    moveChecker.getRectangle().translate(-5, 0);
+                    moveChecker.setObjectBounds(moveChecker.getRectangle().getX() + moveChecker.getRectangle().getWidth(), moveChecker.getRectangle().getY(), moveChecker.getRectangle().getX(), moveChecker.getRectangle().getY() + moveChecker.getRectangle().getHeight());
+                }
+
+                //}
+                break;
+
+            case 1:
+                //for (int i = 0; i < 7; i++) {
+                moveChecker.getRectangle().translate(-5, 0);
+                moveChecker.setObjectBounds(moveChecker.getRectangle().getX() + moveChecker.getRectangle().getWidth(), moveChecker.getRectangle().getY(), moveChecker.getRectangle().getX(), moveChecker.getRectangle().getY() + moveChecker.getRectangle().getHeight());
+                if (cD(moveChecker)) {
+                    playerRectangle.getRectangle().translate(-35, 0);
+                    moveChecker.getRectangle().translate(-30, 0);
+                    playerRectangle.setObjectBounds(playerRectangle.getRectangle().getX() + playerRectangle.getRectangle().getWidth(), playerRectangle.getRectangle().getY(), playerRectangle.getRectangle().getX(), playerRectangle.getRectangle().getY() + playerRectangle.getRectangle().getHeight());
+                    for (Ball ball : balls) {
+                        if (!ball.isEaten() && CollisionDetector.collisionDetector(playerRectangle, ball)) {
+                            ball.delete();
+                            ball.setEaten(true);
+                            ballsRemaining--;
+                            scoreText.setText(String.valueOf(ballsRemaining));
+                        }
+                    }
+                    for (RectagleObject ghost : ghosts) {
+                        if (CollisionDetector.collisionDetector(ghost, playerRectangle)) {
+                            isGameOver = true;
+                        }
+
+                    }
+                } else {
+                    moveChecker.getRectangle().translate(5, 0);
+                    moveChecker.setObjectBounds(moveChecker.getRectangle().getX() + moveChecker.getRectangle().getWidth(), moveChecker.getRectangle().getY(), moveChecker.getRectangle().getX(), moveChecker.getRectangle().getY() + moveChecker.getRectangle().getHeight());
+
+                }
+
+                //}
+                break;
+            case 2:
+                //for (int i = 0; i < 7; i++) {
+                moveChecker.getRectangle().translate(0, -5);
+                moveChecker.setObjectBounds(moveChecker.getRectangle().getX() + moveChecker.getRectangle().getWidth(), moveChecker.getRectangle().getY(), moveChecker.getRectangle().getX(), moveChecker.getRectangle().getY() + moveChecker.getRectangle().getHeight());
+                if (cD(moveChecker)) {
+                    playerRectangle.getRectangle().translate(0, -35);
+                    moveChecker.getRectangle().translate(0, -30);
+                    playerRectangle.setObjectBounds(playerRectangle.getRectangle().getX() + playerRectangle.getRectangle().getWidth(), playerRectangle.getRectangle().getY(), playerRectangle.getRectangle().getX(), playerRectangle.getRectangle().getY() + playerRectangle.getRectangle().getHeight());
+                    for (Ball ball : balls) {
+                        if (!ball.isEaten() && CollisionDetector.collisionDetector(playerRectangle, ball)) {
+                            ball.delete();
+                            ball.setEaten(true);
+                            ballsRemaining--;
+                            scoreText.setText(String.valueOf(ballsRemaining));
+                        }
+                    }
+                    for (RectagleObject ghost : ghosts) {
+                        if (CollisionDetector.collisionDetector(ghost, playerRectangle)) {
+                            isGameOver = true;
+                        }
+
+                    }
+                } else {
+                    moveChecker.getRectangle().translate(0, 5);
+                    moveChecker.setObjectBounds(moveChecker.getRectangle().getX() + moveChecker.getRectangle().getWidth(), moveChecker.getRectangle().getY(), moveChecker.getRectangle().getX(), moveChecker.getRectangle().getY() + moveChecker.getRectangle().getHeight());
+
+                }
+
+                // }
+                break;
+            case 3:
+                //for (int i = 0; i < 7; i++) {
+                moveChecker.getRectangle().translate(0, 5);
+                moveChecker.setObjectBounds(moveChecker.getRectangle().getX() + moveChecker.getRectangle().getWidth(), moveChecker.getRectangle().getY(), moveChecker.getRectangle().getX(), moveChecker.getRectangle().getY() + moveChecker.getRectangle().getHeight());
+                if (cD(moveChecker)) {
+                    playerRectangle.getRectangle().translate(0, 35);
+                    moveChecker.getRectangle().translate(0, 30);
+                    playerRectangle.setObjectBounds(playerRectangle.getRectangle().getX() + playerRectangle.getRectangle().getWidth(), playerRectangle.getRectangle().getY(), playerRectangle.getRectangle().getX(), playerRectangle.getRectangle().getY() + playerRectangle.getRectangle().getHeight());
+                } else {
+                    moveChecker.getRectangle().translate(0, -5);
+                    moveChecker.setObjectBounds(moveChecker.getRectangle().getX() + moveChecker.getRectangle().getWidth(), moveChecker.getRectangle().getY(), moveChecker.getRectangle().getX(), moveChecker.getRectangle().getY() + moveChecker.getRectangle().getHeight());
+
+                }
+                for (Ball ball : balls) {
+                    if (!ball.isEaten() && CollisionDetector.collisionDetector(playerRectangle, ball)) {
+                        ball.delete();
+                        ball.setEaten(true);
+                        ballsRemaining--;
+                        scoreText.setText(String.valueOf(ballsRemaining));
+                    }
+                }
+                for (RectagleObject ghost : ghosts) {
+                    if (CollisionDetector.collisionDetector(ghost, playerRectangle)) {
+                        isGameOver = true;
                     }
 
                 }
-                System.out.println(Arrays.toString(directionsPossible));
+                //}
+                break;
+        }
+    }
+
+    public void startGhost() throws InterruptedException {
+
+
+        while (!isGameOver) {
+            movePlayer(currentKey);
+
+
+            for (int i = 0; i < ghosts.length; i++) {
+                LinkedList<Integer> directionsPossible = new LinkedList<>();
+                //CheckRight
+                ghostMoveCheckers[i].getRectangle().translate(5, 0);
+                ghostMoveCheckers[i].setObjectBounds(ghostMoveCheckers[i].getRectangle().getX() + ghostMoveCheckers[i].getRectangle().getWidth(), ghostMoveCheckers[i].getRectangle().getY(), ghostMoveCheckers[i].getRectangle().getX(), ghostMoveCheckers[i].getRectangle().getY() + ghostMoveCheckers[i].getRectangle().getHeight());
+                if (cD(ghostMoveCheckers[i])) {
+                    if (ghosts[i].lastMove != 0) {
+                        directionsPossible.add(0);
+                    }
+                }
+                ghostMoveCheckers[i].getRectangle().translate(-5, 0);
+                ghostMoveCheckers[i].setObjectBounds(ghostMoveCheckers[i].getRectangle().getX() + ghostMoveCheckers[i].getRectangle().getWidth(), ghostMoveCheckers[i].getRectangle().getY(), ghostMoveCheckers[i].getRectangle().getX(), ghostMoveCheckers[i].getRectangle().getY() + ghostMoveCheckers[i].getRectangle().getHeight());
+                //Check Left
+                ghostMoveCheckers[i].getRectangle().translate(-5, 0);
+                ghostMoveCheckers[i].setObjectBounds(ghostMoveCheckers[i].getRectangle().getX() + ghostMoveCheckers[i].getRectangle().getWidth(), ghostMoveCheckers[i].getRectangle().getY(), ghostMoveCheckers[i].getRectangle().getX(), ghostMoveCheckers[i].getRectangle().getY() + ghostMoveCheckers[i].getRectangle().getHeight());
+                if (cD(ghostMoveCheckers[i])) {
+                    if (ghosts[i].lastMove != 1) {
+                        directionsPossible.add(1);
+                    }
+                }
+                ghostMoveCheckers[i].getRectangle().translate(5, 0);
+                ghostMoveCheckers[i].setObjectBounds(ghostMoveCheckers[i].getRectangle().getX() + ghostMoveCheckers[i].getRectangle().getWidth(), ghostMoveCheckers[i].getRectangle().getY(), ghostMoveCheckers[i].getRectangle().getX(), ghostMoveCheckers[i].getRectangle().getY() + ghostMoveCheckers[i].getRectangle().getHeight());
+                //Check Up
+                ghostMoveCheckers[i].getRectangle().translate(0, -5);
+                ghostMoveCheckers[i].setObjectBounds(ghostMoveCheckers[i].getRectangle().getX() + ghostMoveCheckers[i].getRectangle().getWidth(), ghostMoveCheckers[i].getRectangle().getY(), ghostMoveCheckers[i].getRectangle().getX(), ghostMoveCheckers[i].getRectangle().getY() + ghostMoveCheckers[i].getRectangle().getHeight());
+                if (cD(ghostMoveCheckers[i])) {
+                    if (ghosts[i].lastMove != 2) {
+                        directionsPossible.add(2);
+                    }
+                }
+                ghostMoveCheckers[i].getRectangle().translate(0, 5);
+                ghostMoveCheckers[i].setObjectBounds(ghostMoveCheckers[i].getRectangle().getX() + ghostMoveCheckers[i].getRectangle().getWidth(), ghostMoveCheckers[i].getRectangle().getY(), ghostMoveCheckers[i].getRectangle().getX(), ghostMoveCheckers[i].getRectangle().getY() + ghostMoveCheckers[i].getRectangle().getHeight());
+                //Check Down
+                ghostMoveCheckers[i].getRectangle().translate(0, 5);
+                ghostMoveCheckers[i].setObjectBounds(ghostMoveCheckers[i].getRectangle().getX() + ghostMoveCheckers[i].getRectangle().getWidth(), ghostMoveCheckers[i].getRectangle().getY(), ghostMoveCheckers[i].getRectangle().getX(), ghostMoveCheckers[i].getRectangle().getY() + ghostMoveCheckers[i].getRectangle().getHeight());
+                if (cD(ghostMoveCheckers[i])) {
+                    if (ghosts[i].lastMove != 3) {
+                        directionsPossible.add(3);
+                    }
+                }
+                ghostMoveCheckers[i].getRectangle().translate(0, -5);
+                ghostMoveCheckers[i].setObjectBounds(ghostMoveCheckers[i].getRectangle().getX() + ghostMoveCheckers[i].getRectangle().getWidth(), ghostMoveCheckers[i].getRectangle().getY(), ghostMoveCheckers[i].getRectangle().getX(), ghostMoveCheckers[i].getRectangle().getY() + ghostMoveCheckers[i].getRectangle().getHeight());
+
+
+                //System.out.println("ghost " + i + " lastmove:");
+                System.out.println(ghosts[i].lastMove);
+                System.out.println("ghost directions possible");
+                System.out.println(Arrays.toString(directionsPossible.toArray()));
 
                 int direction = 0;
-                double rdn = Math.random();
-                System.out.println(rdn);
+                System.out.println("directionsPossibleSize: " + directionsPossible.size());
+                int rdn = (int) (Math.random() * directionsPossible.size());
 
-                if (rdn > 0.66) {
-                    direction = directionsPossible[0];
-                    System.out.println(direction);
-                } else if (rdn > 0.33) {
-                    direction = directionsPossible[1];
-                    System.out.println(direction);
-                } else {
-                    direction = directionsPossible[2];
-                    System.out.println(direction);
-
-                }
+                System.out.println("rdn: " + rdn);
+                direction = directionsPossible.get(rdn);
+                System.out.println("Directions possible index of " + rdn + ": " + directionsPossible.get(rdn));
 
 
+                System.out.println("========================");
+                System.out.println("Ghost " + i + " lastMove was: " + ghosts[i].lastMove);
+                System.out.println("Direction chosen was: " + direction);
+                System.out.println(direction);
+                moveGhost(direction, i);
+                //Inverts LastMove so Ghost doesnt go back;
                 switch (direction) {
                     case 0:
-                        //for (int i = 0; i < 7; i++) {
-                        ghostMoveCheckers[i].getRectangle().translate(5, 0);
-                        ghostMoveCheckers[i].setObjectBounds(ghostMoveCheckers[i].getRectangle().getX() + ghostMoveCheckers[i].getRectangle().getWidth(), ghostMoveCheckers[i].getRectangle().getY(), ghostMoveCheckers[i].getRectangle().getX(), ghostMoveCheckers[i].getRectangle().getY() + ghostMoveCheckers[i].getRectangle().getHeight());
-                        if (cD(ghostMoveCheckers[i])) {
-                            ghosts[i].getRectangle().translate(35, 0);
-                            ghostMoveCheckers[i].getRectangle().translate(30, 0);
-                            ghosts[i].setObjectBounds(ghosts[i].getRectangle().getX() + ghosts[i].getRectangle().getWidth(), ghosts[i].getRectangle().getY(), ghosts[i].getRectangle().getX(), ghosts[i].getRectangle().getY() + ghosts[i].getRectangle().getHeight());
-                            ghosts[i].lastMove = 0;
-                        } else {
-                            ghostMoveCheckers[i].getRectangle().translate(-5, 0);
-                            ghostMoveCheckers[i].setObjectBounds(ghostMoveCheckers[i].getRectangle().getX() + ghostMoveCheckers[i].getRectangle().getWidth(), ghostMoveCheckers[i].getRectangle().getY(), ghostMoveCheckers[i].getRectangle().getX(), ghostMoveCheckers[i].getRectangle().getY() + ghostMoveCheckers[i].getRectangle().getHeight());
-                        }
-
-                        //}
+                        ghosts[i].lastMove = 1;
                         break;
-
                     case 1:
-                        //for (int i = 0; i < 7; i++) {
-                        ghostMoveCheckers[i].getRectangle().translate(-5, 0);
-                        ghostMoveCheckers[i].setObjectBounds(ghostMoveCheckers[i].getRectangle().getX() + ghostMoveCheckers[i].getRectangle().getWidth(), ghostMoveCheckers[i].getRectangle().getY(), ghostMoveCheckers[i].getRectangle().getX(), ghostMoveCheckers[i].getRectangle().getY() + ghostMoveCheckers[i].getRectangle().getHeight());
-                        if (cD(ghostMoveCheckers[i])) {
-                            ghosts[i].getRectangle().translate(-35, 0);
-                            ghostMoveCheckers[i].getRectangle().translate(-30, 0);
-                            ghosts[i].setObjectBounds(ghosts[i].getRectangle().getX() + ghosts[i].getRectangle().getWidth(), ghosts[i].getRectangle().getY(), ghosts[i].getRectangle().getX(), ghosts[i].getRectangle().getY() + ghosts[i].getRectangle().getHeight());
-                            ghosts[i].lastMove = 1;
-                        } else {
-                            ghostMoveCheckers[i].getRectangle().translate(5, 0);
-                            ghostMoveCheckers[i].setObjectBounds(ghostMoveCheckers[i].getRectangle().getX() + ghostMoveCheckers[i].getRectangle().getWidth(), ghostMoveCheckers[i].getRectangle().getY(), ghostMoveCheckers[i].getRectangle().getX(), ghostMoveCheckers[i].getRectangle().getY() + ghostMoveCheckers[i].getRectangle().getHeight());
-
-                        }
-
-                        //}
+                        ghosts[i].lastMove = 0;
                         break;
                     case 2:
-                        //for (int i = 0; i < 7; i++) {
-                        ghostMoveCheckers[i].getRectangle().translate(0, -5);
-                        ghostMoveCheckers[i].setObjectBounds(ghostMoveCheckers[i].getRectangle().getX() + ghostMoveCheckers[i].getRectangle().getWidth(), ghostMoveCheckers[i].getRectangle().getY(), ghostMoveCheckers[i].getRectangle().getX(), ghostMoveCheckers[i].getRectangle().getY() + ghostMoveCheckers[i].getRectangle().getHeight());
-                        if (cD(ghostMoveCheckers[i])) {
-                            ghosts[i].getRectangle().translate(0, -35);
-                            ghostMoveCheckers[i].getRectangle().translate(0, -30);
-                            ghosts[i].setObjectBounds(ghosts[i].getRectangle().getX() + ghosts[i].getRectangle().getWidth(), ghosts[i].getRectangle().getY(), ghosts[i].getRectangle().getX(), ghosts[i].getRectangle().getY() + ghosts[i].getRectangle().getHeight());
-                            ghosts[i].lastMove = 2;
-                        } else {
-                            ghostMoveCheckers[i].getRectangle().translate(0, 5);
-                            ghostMoveCheckers[i].setObjectBounds(ghostMoveCheckers[i].getRectangle().getX() + ghostMoveCheckers[i].getRectangle().getWidth(), ghostMoveCheckers[i].getRectangle().getY(), ghostMoveCheckers[i].getRectangle().getX(), ghostMoveCheckers[i].getRectangle().getY() + ghostMoveCheckers[i].getRectangle().getHeight());
-
-                        }
-
-                        // }
+                        ghosts[i].lastMove = 3;
                         break;
                     case 3:
-                        //for (int i = 0; i < 7; i++) {
-                        ghostMoveCheckers[i].getRectangle().translate(0, 5);
-                        ghostMoveCheckers[i].setObjectBounds(ghostMoveCheckers[i].getRectangle().getX() + ghostMoveCheckers[i].getRectangle().getWidth(), ghostMoveCheckers[i].getRectangle().getY(), ghostMoveCheckers[i].getRectangle().getX(), ghostMoveCheckers[i].getRectangle().getY() + ghostMoveCheckers[i].getRectangle().getHeight());
-                        if (cD(ghostMoveCheckers[i])) {
-                            ghosts[i].getRectangle().translate(0, 35);
-                            ghostMoveCheckers[i].getRectangle().translate(0, 30);
-                            ghosts[i].setObjectBounds(ghosts[i].getRectangle().getX() + ghosts[i].getRectangle().getWidth(), ghosts[i].getRectangle().getY(), ghosts[i].getRectangle().getX(), ghosts[i].getRectangle().getY() + ghosts[i].getRectangle().getHeight());
-                            ghosts[i].lastMove = 3;
-                        } else {
-                            ghostMoveCheckers[i].getRectangle().translate(0, -5);
-                            ghostMoveCheckers[i].setObjectBounds(ghostMoveCheckers[i].getRectangle().getX() + ghostMoveCheckers[i].getRectangle().getWidth(), ghostMoveCheckers[i].getRectangle().getY(), ghostMoveCheckers[i].getRectangle().getX(), ghostMoveCheckers[i].getRectangle().getY() + ghostMoveCheckers[i].getRectangle().getHeight());
-
-                        }
-
-                        //}
+                        ghosts[i].lastMove = 2;
                         break;
                 }
+
+
+                System.out.println("===================");
+
+
+            }
+            for (RectagleObject ghost : ghosts) {
+                if (CollisionDetector.collisionDetector(ghost, playerRectangle)) {
+                    isGameOver = true;
+                }
+
             }
             Thread.sleep(350);
         }
@@ -180,12 +334,32 @@ public class Game implements KeyboardHandler {
         downArrow.setKey(KeyboardEvent.KEY_DOWN);
         downArrow.setKeyboardEventType(KeyboardEventType.KEY_PRESSED);
 
+        KeyboardEvent rightArrowR = new KeyboardEvent();
+        rightArrowR.setKey(KeyboardEvent.KEY_RIGHT);
+        rightArrowR.setKeyboardEventType(KeyboardEventType.KEY_RELEASED);
+
+        KeyboardEvent leftArrowR = new KeyboardEvent();
+        leftArrowR.setKey(KeyboardEvent.KEY_LEFT);
+        leftArrowR.setKeyboardEventType(KeyboardEventType.KEY_RELEASED);
+
+        KeyboardEvent upArrowR = new KeyboardEvent();
+        upArrowR.setKey(KeyboardEvent.KEY_UP);
+        upArrowR.setKeyboardEventType(KeyboardEventType.KEY_RELEASED);
+
+        KeyboardEvent downArrowR = new KeyboardEvent();
+        downArrowR.setKey(KeyboardEvent.KEY_DOWN);
+        downArrowR.setKeyboardEventType(KeyboardEventType.KEY_RELEASED);
+
         //Associate event to keyboard
 
         keyboard.addEventListener(rightArrow);
         keyboard.addEventListener(leftArrow);
         keyboard.addEventListener(upArrow);
         keyboard.addEventListener(downArrow);
+        keyboard.addEventListener(rightArrowR);
+        keyboard.addEventListener(leftArrowR);
+        keyboard.addEventListener(upArrowR);
+        keyboard.addEventListener(downArrowR);
 
     }
 
@@ -207,7 +381,7 @@ public class Game implements KeyboardHandler {
     }
 
     public void startBackground() {
-        gameObjects = new RectagleObject[37];
+        gameObjects = new RectagleObject[38];
         gameObjects[0] = new RectagleObject(60, 60, 100, 65);
         gameObjects[7] = new RectagleObject(200, 60, 135, 65);
         gameObjects[8] = new RectagleObject(445, 60, 135, 65);
@@ -240,6 +414,7 @@ public class Game implements KeyboardHandler {
         gameObjects[34] = new RectagleObject(550, 620, 30, 70);
         gameObjects[35] = new RectagleObject(60, 690, 275, 30);
         gameObjects[36] = new RectagleObject(445, 690, 275, 30);
+        gameObjects[37] = new RectagleObject(270, 305, 240, 135);
 
         gameObjects[2] = new RectagleObject(375, 10, 30, 115);
         gameObjects[3] = new RectagleObject(10, 10, 760, 10);
@@ -267,13 +442,17 @@ public class Game implements KeyboardHandler {
 
         }
         for (int i = 0; i < ghostMoveCheckers.length; i++) {
-            ghostMoveCheckers[i] = new RectagleObject(375, 340, 30, 30);
+            ghostMoveCheckers[i] = new RectagleObject(375, 270, 30, 30);
+            ghostMoveCheckers[i].fill();
 
 
         }
+
+        //Creates Ghosts
+
         for (int i = 0; i < ghosts.length; i++) {
 
-            ghosts[i] = new RectagleObject(375, 340, 30, 30);
+            ghosts[i] = new RectagleObject(375, 270, 30, 30);
 
             ghosts[i].setColor(randomColor());
             ghosts[i].fill();
@@ -290,112 +469,45 @@ public class Game implements KeyboardHandler {
 
     }
 
+
     @Override
     public void keyPressed(KeyboardEvent keyboardEvent) {
 
+        if (!isGameOver) {
+            switch (keyboardEvent.getKey()) {
+                case KeyboardEvent.KEY_RIGHT:
+                    currentKey = 0;
+                    break;
+                case KeyboardEvent.KEY_LEFT:
+                    currentKey = 1;
+                    break;
+                case KeyboardEvent.KEY_UP:
+                    currentKey = 2;
+                    break;
+                case KeyboardEvent.KEY_DOWN:
+                    currentKey = 3;
+                    break;
+            }
 
-        switch (keyboardEvent.getKey()) {
-            case KeyboardEvent.KEY_RIGHT:
-                //for (int i = 0; i < 7; i++) {
-                moveChecker.getRectangle().translate(5, 0);
-                moveChecker.setObjectBounds(moveChecker.getRectangle().getX() + moveChecker.getRectangle().getWidth(), moveChecker.getRectangle().getY(), moveChecker.getRectangle().getX(), moveChecker.getRectangle().getY() + moveChecker.getRectangle().getHeight());
-                if (cD(moveChecker)) {
-                    playerRectangle.getRectangle().translate(35, 0);
-                    moveChecker.getRectangle().translate(30, 0);
-                    playerRectangle.setObjectBounds(playerRectangle.getRectangle().getX() + playerRectangle.getRectangle().getWidth(), playerRectangle.getRectangle().getY(), playerRectangle.getRectangle().getX(), playerRectangle.getRectangle().getY() + playerRectangle.getRectangle().getHeight());
-                    for (Ball ball : balls) {
-                        if (!ball.isEaten() && CollisionDetector.collisionDetector(playerRectangle, ball)) {
-                            ball.delete();
-                            ball.setEaten(true);
-                            ballsRemaining--;
-                            scoreText.setText(String.valueOf(ballsRemaining));
-                        }
-                    }
-                } else {
-                    moveChecker.getRectangle().translate(-5, 0);
-                    moveChecker.setObjectBounds(moveChecker.getRectangle().getX() + moveChecker.getRectangle().getWidth(), moveChecker.getRectangle().getY(), moveChecker.getRectangle().getX(), moveChecker.getRectangle().getY() + moveChecker.getRectangle().getHeight());
-                }
-
-                //}
-                break;
-
-            case KeyboardEvent.KEY_LEFT:
-                //for (int i = 0; i < 7; i++) {
-                moveChecker.getRectangle().translate(-5, 0);
-                moveChecker.setObjectBounds(moveChecker.getRectangle().getX() + moveChecker.getRectangle().getWidth(), moveChecker.getRectangle().getY(), moveChecker.getRectangle().getX(), moveChecker.getRectangle().getY() + moveChecker.getRectangle().getHeight());
-                if (cD(moveChecker)) {
-                    playerRectangle.getRectangle().translate(-35, 0);
-                    moveChecker.getRectangle().translate(-30, 0);
-                    playerRectangle.setObjectBounds(playerRectangle.getRectangle().getX() + playerRectangle.getRectangle().getWidth(), playerRectangle.getRectangle().getY(), playerRectangle.getRectangle().getX(), playerRectangle.getRectangle().getY() + playerRectangle.getRectangle().getHeight());
-                    for (Ball ball : balls) {
-                        if (!ball.isEaten() && CollisionDetector.collisionDetector(playerRectangle, ball)) {
-                            ball.delete();
-                            ball.setEaten(true);
-                            ballsRemaining--;
-                            scoreText.setText(String.valueOf(ballsRemaining));
-                        }
-                    }
-                } else {
-                    moveChecker.getRectangle().translate(5, 0);
-                    moveChecker.setObjectBounds(moveChecker.getRectangle().getX() + moveChecker.getRectangle().getWidth(), moveChecker.getRectangle().getY(), moveChecker.getRectangle().getX(), moveChecker.getRectangle().getY() + moveChecker.getRectangle().getHeight());
-
-                }
-
-                //}
-                break;
-            case KeyboardEvent.KEY_UP:
-                //for (int i = 0; i < 7; i++) {
-                moveChecker.getRectangle().translate(0, -5);
-                moveChecker.setObjectBounds(moveChecker.getRectangle().getX() + moveChecker.getRectangle().getWidth(), moveChecker.getRectangle().getY(), moveChecker.getRectangle().getX(), moveChecker.getRectangle().getY() + moveChecker.getRectangle().getHeight());
-                if (cD(moveChecker)) {
-                    playerRectangle.getRectangle().translate(0, -35);
-                    moveChecker.getRectangle().translate(0, -30);
-                    playerRectangle.setObjectBounds(playerRectangle.getRectangle().getX() + playerRectangle.getRectangle().getWidth(), playerRectangle.getRectangle().getY(), playerRectangle.getRectangle().getX(), playerRectangle.getRectangle().getY() + playerRectangle.getRectangle().getHeight());
-                    for (Ball ball : balls) {
-                        if (!ball.isEaten() && CollisionDetector.collisionDetector(playerRectangle, ball)) {
-                            ball.delete();
-                            ball.setEaten(true);
-                            ballsRemaining--;
-                            scoreText.setText(String.valueOf(ballsRemaining));
-                        }
-                    }
-                } else {
-                    moveChecker.getRectangle().translate(0, 5);
-                    moveChecker.setObjectBounds(moveChecker.getRectangle().getX() + moveChecker.getRectangle().getWidth(), moveChecker.getRectangle().getY(), moveChecker.getRectangle().getX(), moveChecker.getRectangle().getY() + moveChecker.getRectangle().getHeight());
-
-                }
-
-                // }
-                break;
-            case KeyboardEvent.KEY_DOWN:
-                //for (int i = 0; i < 7; i++) {
-                moveChecker.getRectangle().translate(0, 5);
-                moveChecker.setObjectBounds(moveChecker.getRectangle().getX() + moveChecker.getRectangle().getWidth(), moveChecker.getRectangle().getY(), moveChecker.getRectangle().getX(), moveChecker.getRectangle().getY() + moveChecker.getRectangle().getHeight());
-                if (cD(moveChecker)) {
-                    playerRectangle.getRectangle().translate(0, 35);
-                    moveChecker.getRectangle().translate(0, 30);
-                    playerRectangle.setObjectBounds(playerRectangle.getRectangle().getX() + playerRectangle.getRectangle().getWidth(), playerRectangle.getRectangle().getY(), playerRectangle.getRectangle().getX(), playerRectangle.getRectangle().getY() + playerRectangle.getRectangle().getHeight());
-                } else {
-                    moveChecker.getRectangle().translate(0, -5);
-                    moveChecker.setObjectBounds(moveChecker.getRectangle().getX() + moveChecker.getRectangle().getWidth(), moveChecker.getRectangle().getY(), moveChecker.getRectangle().getX(), moveChecker.getRectangle().getY() + moveChecker.getRectangle().getHeight());
-
-                }
-                for (Ball ball : balls) {
-                    if (!ball.isEaten() && CollisionDetector.collisionDetector(playerRectangle, ball)) {
-                        ball.delete();
-                        ball.setEaten(true);
-                        ballsRemaining--;
-                        scoreText.setText(String.valueOf(ballsRemaining));
-                    }
-                }
-                //}
-                break;
         }
     }
 
     @Override
     public void keyReleased(KeyboardEvent keyboardEvent) {
-
+        switch (keyboardEvent.getKey()) {
+            case KeyboardEvent.KEY_RIGHT:
+                currentKey = -1;
+                break;
+            case KeyboardEvent.KEY_LEFT:
+                currentKey = -1;
+                break;
+            case KeyboardEvent.KEY_UP:
+                currentKey = -1;
+                break;
+            case KeyboardEvent.KEY_DOWN:
+                currentKey = -1;
+                break;
+        }
     }
 
 }

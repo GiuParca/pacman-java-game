@@ -23,6 +23,7 @@ public class RectagleObject extends GameObjects {
         double up = rectangle.getY();
         setObjectBounds(right, up, left, bottom);
         this.setColor(Color.BLACK);
+        lastMove = 2;
 
     }
 
