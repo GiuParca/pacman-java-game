@@ -13,7 +13,6 @@ public class RectagleObject extends GameObjects {
     int lastMove;
 
 
-
     public RectagleObject(double initX, double initY, double width, double height) {
         super();
         this.rectangle = new Rectangle(initX, initY, width, height);
@@ -31,14 +30,27 @@ public class RectagleObject extends GameObjects {
         this.rectangle.fill();
     }
 
+    public void draw() {
+        this.rectangle.draw();
+    }
+
     public void setColor(Color color) {
         this.rectangle.setColor(color);
     }
 
 
-
-    public Rectangle getRectangle(){
+    public Rectangle getRectangle() {
         return this.rectangle;
-}
+    }
+
+    public void translate(int x, int y) {
+        this.rectangle.translate(x, y);
+        double right = rectangle.getX() + rectangle.getWidth();
+        double bottom = rectangle.getY() + rectangle.getHeight();
+        double left = rectangle.getX();
+        double up = rectangle.getY();
+        setObjectBounds(right, up, left, bottom);
+
+    }
 
 }
