@@ -3,16 +3,18 @@ package io.codeforall.VIMdepacote;
 import org.academiadecodigo.simplegraphics.graphics.Color;
 import org.academiadecodigo.simplegraphics.graphics.Ellipse;
 import org.academiadecodigo.simplegraphics.graphics.Rectangle;
+import org.academiadecodigo.simplegraphics.pictures.Picture;
 
 public class Ball extends GameObjects {
 
     private Ellipse ball;
 
     private boolean isEaten;
+    private boolean isSpecial;
 
     public Ball(double initX, double initY, double width, double height) {
         super();
-        this.ball = new Ellipse(initX, initY, width, height);
+        this.ball = new Ellipse(initX, initY,width,height);
         double right = ball.getX() + ball.getWidth();
         double bottom = ball.getY() + ball.getHeight();
         double left = ball.getX();
@@ -32,6 +34,14 @@ public class Ball extends GameObjects {
 
     public void setColor(Color color) {
         this.ball.setColor(color);
+    }
+
+    public void setSpecial() {
+        isSpecial = true;
+    }
+
+    public boolean isSpecial() {
+        return isSpecial;
     }
 
     public void setEaten(boolean eaten) {

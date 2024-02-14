@@ -1,16 +1,19 @@
 package io.codeforall.VIMdepacote;
 
 import org.academiadecodigo.simplegraphics.graphics.Color;
+import org.academiadecodigo.simplegraphics.graphics.Rectangle;
 import org.academiadecodigo.simplegraphics.graphics.Text;
 import org.academiadecodigo.simplegraphics.keyboard.Keyboard;
 import org.academiadecodigo.simplegraphics.keyboard.KeyboardEvent;
 import org.academiadecodigo.simplegraphics.keyboard.KeyboardEventType;
 import org.academiadecodigo.simplegraphics.keyboard.KeyboardHandler;
+import org.academiadecodigo.simplegraphics.pictures.Picture;
 
 import java.util.LinkedList;
 
 public class Game implements KeyboardHandler {
     private Boolean[] arrayCD;
+    private int counterbolinhas;
     private boolean canMove;
     private Ball[] balls = new Ball[441];
     private int ballsRemaining;
@@ -18,17 +21,21 @@ public class Game implements KeyboardHandler {
     private boolean isGameOver;
     private int currentKey = -1;
     private RectagleObject ghostDoor;
+    private int startGameKey = 0;
+    private int lifePlayer = 3;
     private int ghostDoorCounterTimer;
+    private Rectangle menuBackGround = new Rectangle(10, 10, 760, 760);
+    private Picture button = new Picture(334, 334, "src/img_1.png");
     private LinkedList<GhostObject> ghosts = new LinkedList<>();
     private LinkedList<RectagleObject> ghostMoveCheckers = new LinkedList<>();
     //private RectangleObject[] gameObjects;
-    private LinkedList<RectagleObject> gameObjects = new LinkedList<>();
+    private LinkedList<RectagleObject> wallObjects = new LinkedList<>();
     //Picture pacman = new Picture(25, 25, "src/pacman-png-25195.png");
     private PlayerObject playerObject = new PlayerObject(25, 25, 30, 30);
     private RectagleObject moveChecker = new RectagleObject(25, 25, 30, 30);
 
     private RectagleObject backGround = new RectagleObject(10, 10, 760, 760);
-
+    private boolean superSaiyajin;
 
     public Game() {
 
@@ -39,7 +46,11 @@ public class Game implements KeyboardHandler {
         startGhosts();
         startText();
         startGhostDoor();
+
+
         this.keyboardSetup();
+
+
     }
 
     public void moveGhost(int direction, int ghostIndex) {
@@ -69,7 +80,8 @@ public class Game implements KeyboardHandler {
                 break;
         }
     }
-    public boolean movePlayer(int directionToMove) {
+
+    public boolean movePlayer(int directionToMove) throws InterruptedException {
 
         switch (directionToMove) {
             case 0:
@@ -79,20 +91,7 @@ public class Game implements KeyboardHandler {
                     playerObject.setPicture("src/pacmanRight.png");
                     playerObject.translate(35, 0);
                     moveChecker.translate(30, 0);
-                    for (Ball ball : balls) {
-                        if (!ball.isEaten() && CollisionDetector.collisionDetector(playerObject, ball)) {
-                            ball.delete();
-                            ball.setEaten(true);
-                            ballsRemaining--;
-                            scoreText.setText(String.valueOf(ballsRemaining));
-                        }
-                    }
-                    for (GhostObject ghost : ghosts) {
-                        if (CollisionDetector.collisionDetector(ghost, playerObject)) {
-                            isGameOver = true;
-                        }
-
-                    }
+                    ballCollision();
                     playerObject.lastMove = 0;
                     return true;
                 } else {
@@ -113,20 +112,7 @@ public class Game implements KeyboardHandler {
                     playerObject.setPicture("src/pacmanLeft.png");
                     playerObject.translate(-35, 0);
                     moveChecker.translate(-30, 0);
-                    for (Ball ball : balls) {
-                        if (!ball.isEaten() && CollisionDetector.collisionDetector(playerObject, ball)) {
-                            ball.delete();
-                            ball.setEaten(true);
-                            ballsRemaining--;
-                            scoreText.setText(String.valueOf(ballsRemaining));
-                        }
-                    }
-                    for (GhostObject ghost : ghosts) {
-                        if (CollisionDetector.collisionDetector(ghost, playerObject)) {
-                            isGameOver = true;
-                        }
-
-                    }
+                    ballCollision();
                     playerObject.lastMove = 1;
                     return true;
                 } else {
@@ -146,20 +132,7 @@ public class Game implements KeyboardHandler {
                     playerObject.setPicture("src/pacmanUp.png");
                     playerObject.translate(0, -35);
                     moveChecker.translate(0, -30);
-                    for (Ball ball : balls) {
-                        if (!ball.isEaten() && CollisionDetector.collisionDetector(playerObject, ball)) {
-                            ball.delete();
-                            ball.setEaten(true);
-                            ballsRemaining--;
-                            scoreText.setText(String.valueOf(ballsRemaining));
-                        }
-                    }
-                    for (GhostObject ghost : ghosts) {
-                        if (CollisionDetector.collisionDetector(ghost, playerObject)) {
-                            isGameOver = true;
-                        }
-
-                    }
+                    ballCollision();
                     playerObject.lastMove = 2;
                     return true;
                 } else {
@@ -179,20 +152,7 @@ public class Game implements KeyboardHandler {
                     playerObject.setPicture("src/pacmanDown.png");
                     playerObject.translate(0, 35);
                     moveChecker.translate(0, 30);
-                    for (Ball ball : balls) {
-                        if (!ball.isEaten() && CollisionDetector.collisionDetector(playerObject, ball)) {
-                            ball.delete();
-                            ball.setEaten(true);
-                            ballsRemaining--;
-                            scoreText.setText(String.valueOf(ballsRemaining));
-                        }
-                    }
-                    for (GhostObject ghost : ghosts) {
-                        if (CollisionDetector.collisionDetector(ghost, playerObject)) {
-                            isGameOver = true;
-                        }
-
-                    }
+                    ballCollision();
                     playerObject.lastMove = 3;
                     return true;
                 } else {
@@ -210,6 +170,55 @@ public class Game implements KeyboardHandler {
         return false;
 
     }
+
+    private void ballCollision() throws InterruptedException {
+        for (Ball ball : balls) {
+            if (!ball.isEaten() && CollisionDetector.collisionDetector(playerObject, ball)) {
+                if (ball.isSpecial()) {
+                    superSaiyajin = true;
+                    System.out.println("supersayajin" + superSaiyajin);
+                }
+                ball.delete();
+                ball.setEaten(true);
+                ballsRemaining--;
+                scoreText.setText(String.valueOf(ballsRemaining));
+            }
+        }
+        ghostCollision();
+    }
+
+    public void startMenu() {
+
+        menuBackGround.setColor(Color.BLACK);
+        menuBackGround.fill();
+
+        button.draw();
+
+
+    }
+
+
+    public void gameOverScreen() throws InterruptedException {
+        menuBackGround.setColor(Color.BLACK);
+        menuBackGround.fill();
+
+        Picture gameOver = new Picture(130, 130, "src/img_2.png");
+        gameOver.draw();
+        Thread.sleep(1000);
+        gameOver.delete();
+        menuBackGround.delete();
+        System.exit(0);
+
+
+    }
+
+    private void closeMenu() {
+        menuBackGround.delete();
+        System.out.println(startGameKey);
+        button.delete();
+    }
+
+
     public void startGame(int speedMillis) throws InterruptedException {
 
         while (!isGameOver) {
@@ -218,16 +227,26 @@ public class Game implements KeyboardHandler {
             if (!movePlayer(currentKey)) {
                 movePlayer(currentKey);
             }
-
+            for (GhostObject g : ghosts) {
+                g.setPicture("src/Untitled-1.png");
+            }
             // GhostDoor opening logic
 
             if (ghostDoorCounterTimer == 30) {
                 ghostDoor.translate(40, 0);
+
             }
-            if (ghostDoorCounterTimer == 34) {
-                ghostDoor.translate(-40, 0);
+            /*if (ghostDoorCounterTimer > 34) {
+                for (GhostObject g : ghosts) {
+
+                    if (CollisionDetector.collisionDetector(ghostDoor, g)) {
+                        break;
+                    }
+                }
                 ghostDoorCounterTimer = 0;
-            }
+                //ghostDoor.translate(-40, 0);
+
+            }*/
 
 
             for (int i = 0; i < ghosts.size(); i++) {
@@ -287,12 +306,7 @@ public class Game implements KeyboardHandler {
                 }
 
             }
-            for (GhostObject ghost : ghosts) {
-                if (CollisionDetector.collisionDetector(ghost, playerObject)) {
-                    isGameOver = true;
-                }
-
-            }
+            ghostCollision();
             ghostDoorCounterTimer++;
             Thread.sleep(speedMillis);
             for (GhostObject g : ghosts) {
@@ -303,16 +317,45 @@ public class Game implements KeyboardHandler {
         }
 
     }
+
+    private void ghostCollision() throws InterruptedException {
+        for (GhostObject ghost : ghosts) {
+            if (CollisionDetector.collisionDetector(ghost, playerObject)) {
+                if (!superSaiyajin) {
+                    isGameOver = true;
+                    Thread.sleep(500);
+                    if (lifePlayer > 0) {
+                        losesLife();
+                    } else {
+                        gameOverScreen();
+                    }
+                } else {
+
+                    ghostMoveCheckers.remove(ghostMoveCheckers.get(ghosts.indexOf(ghost)));
+                    ghosts.remove(ghost);
+                    ghostMoveCheckers.add(new RectagleObject(375, 340, 30, 30));
+                    ghostMoveCheckers.getLast().fill();
+                    ghosts.add(new GhostObject(375, 340, 30, 30));
+                    ghosts.getLast().draw();
+
+                }
+            }
+
+
+        }
+    }
+
     public boolean wallsCollisionDetector(GameObjects object) {
-        arrayCD = new Boolean[gameObjects.size()];
-        for (int i = 0; i < gameObjects.size(); i++) {
-            arrayCD[i] = CollisionDetector.collisionDetector(object, gameObjects.get(i));
+        arrayCD = new Boolean[wallObjects.size()];
+        for (int i = 0; i < wallObjects.size(); i++) {
+            arrayCD[i] = CollisionDetector.collisionDetector(object, wallObjects.get(i));
         }
         return CollisionDetector.canMove(arrayCD);
         // System.out.println(canMove);
 
 
     }
+
     public void keyboardSetup() {
 
         Keyboard keyboard = new Keyboard(this);
@@ -351,6 +394,9 @@ public class Game implements KeyboardHandler {
         downArrowR.setKey(KeyboardEvent.KEY_DOWN);
         downArrowR.setKeyboardEventType(KeyboardEventType.KEY_RELEASED);
 
+        KeyboardEvent enter = new KeyboardEvent();
+        enter.setKey(KeyboardEvent.KEY_ENTER);
+        enter.setKeyboardEventType(KeyboardEventType.KEY_PRESSED);
         //Associate event to keyboard
 
         keyboard.addEventListener(rightArrow);
@@ -361,66 +407,71 @@ public class Game implements KeyboardHandler {
         keyboard.addEventListener(leftArrowR);
         keyboard.addEventListener(upArrowR);
         keyboard.addEventListener(downArrowR);
+        keyboard.addEventListener(enter);
 
     }
+
     public void startBackground() {
-        gameObjects.add(new RectagleObject(60, 60, 100, 65));
-        gameObjects.add(new RectagleObject(200, 60, 135, 65));
-        gameObjects.add(new RectagleObject(445, 60, 135, 65));
-        gameObjects.add(new RectagleObject(620, 60, 100, 65));
-        gameObjects.add(new RectagleObject(60, 165, 100, 30));
-        gameObjects.add(new RectagleObject(620, 165, 100, 30));
-        gameObjects.add(new RectagleObject(200, 165, 30, 170));
-        gameObjects.add(new RectagleObject(550, 165, 30, 170));
-        gameObjects.add(new RectagleObject(230, 235, 105, 30));
-        gameObjects.add(new RectagleObject(445, 235, 105, 30));
-        gameObjects.add(new RectagleObject(375, 165, 30, 100));
-        gameObjects.add(new RectagleObject(270, 165, 240, 30));
-        gameObjects.add(new RectagleObject(375, 480, 30, 100));
-        gameObjects.add(new RectagleObject(270, 480, 240, 30));
-        gameObjects.add(new RectagleObject(375, 620, 30, 100));
-        gameObjects.add(new RectagleObject(270, 620, 240, 30));
-        gameObjects.add(new RectagleObject(20, 235, 140, 275));
-        gameObjects.add(new RectagleObject(620, 235, 140, 275));
-        gameObjects.add(new RectagleObject(200, 375, 30, 135));
-        gameObjects.add(new RectagleObject(550, 375, 30, 135));
-        gameObjects.add(new RectagleObject(200, 550, 135, 30));
-        gameObjects.add(new RectagleObject(445, 550, 135, 30));
-        gameObjects.add(new RectagleObject(60, 550, 100, 30));
-        gameObjects.add(new RectagleObject(620, 550, 100, 30));
-        gameObjects.add(new RectagleObject(130, 580, 30, 70));
-        gameObjects.add(new RectagleObject(620, 580, 30, 70));
-        gameObjects.add(new RectagleObject(20, 620, 70, 30));
-        gameObjects.add(new RectagleObject(690, 620, 70, 30));
-        gameObjects.add(new RectagleObject(200, 620, 30, 70));
-        gameObjects.add(new RectagleObject(550, 620, 30, 70));
-        gameObjects.add(new RectagleObject(60, 690, 275, 30));
-        gameObjects.add(new RectagleObject(445, 690, 275, 30));
-        gameObjects.add(new RectagleObject(270, 305, 30, 135));
-        gameObjects.add(new RectagleObject(480, 305, 30, 135));
-        gameObjects.add(new RectagleObject(270, 305, 100, 30));
-        gameObjects.add(new RectagleObject(410, 305, 100, 30));
-        gameObjects.add(new RectagleObject(270, 410, 240, 30));
-        gameObjects.add(new RectagleObject(375, 10, 30, 115));
-        gameObjects.add(new RectagleObject(10, 10, 760, 10));
-        gameObjects.add(new RectagleObject(10, 10, 10, 760));
-        gameObjects.add(new RectagleObject(760, 10, 10, 760));
-        gameObjects.add(new RectagleObject(10, 760, 760, 10));
-        for (int i = 0; i < gameObjects.size(); i++) {
-            gameObjects.get(i).setColor(Color.BLUE);
-            gameObjects.get(i).draw();
+        wallObjects.add(new RectagleObject(60, 60, 100, 65));
+        wallObjects.add(new RectagleObject(200, 60, 135, 65));
+        wallObjects.add(new RectagleObject(445, 60, 135, 65));
+        wallObjects.add(new RectagleObject(620, 60, 100, 65));
+        wallObjects.add(new RectagleObject(60, 165, 100, 30));
+        wallObjects.add(new RectagleObject(620, 165, 100, 30));
+        wallObjects.add(new RectagleObject(200, 165, 30, 170));
+        wallObjects.add(new RectagleObject(550, 165, 30, 170));
+        wallObjects.add(new RectagleObject(230, 235, 105, 30));
+        wallObjects.add(new RectagleObject(445, 235, 105, 30));
+        wallObjects.add(new RectagleObject(375, 165, 30, 100));
+        wallObjects.add(new RectagleObject(270, 165, 240, 30));
+        wallObjects.add(new RectagleObject(375, 480, 30, 100));
+        wallObjects.add(new RectagleObject(270, 480, 240, 30));
+        wallObjects.add(new RectagleObject(375, 620, 30, 100));
+        wallObjects.add(new RectagleObject(270, 620, 240, 30));
+        wallObjects.add(new RectagleObject(20, 235, 140, 275));
+        wallObjects.add(new RectagleObject(620, 235, 140, 275));
+        wallObjects.add(new RectagleObject(200, 375, 30, 135));
+        wallObjects.add(new RectagleObject(550, 375, 30, 135));
+        wallObjects.add(new RectagleObject(200, 550, 135, 30));
+        wallObjects.add(new RectagleObject(445, 550, 135, 30));
+        wallObjects.add(new RectagleObject(60, 550, 100, 30));
+        wallObjects.add(new RectagleObject(620, 550, 100, 30));
+        wallObjects.add(new RectagleObject(130, 580, 30, 70));
+        wallObjects.add(new RectagleObject(620, 580, 30, 70));
+        wallObjects.add(new RectagleObject(20, 620, 70, 30));
+        wallObjects.add(new RectagleObject(690, 620, 70, 30));
+        wallObjects.add(new RectagleObject(200, 620, 30, 70));
+        wallObjects.add(new RectagleObject(550, 620, 30, 70));
+        wallObjects.add(new RectagleObject(60, 690, 275, 30));
+        wallObjects.add(new RectagleObject(445, 690, 275, 30));
+        wallObjects.add(new RectagleObject(270, 305, 30, 135));
+        wallObjects.add(new RectagleObject(480, 305, 30, 135));
+        wallObjects.add(new RectagleObject(270, 305, 100, 30));
+        wallObjects.add(new RectagleObject(410, 305, 100, 30));
+        wallObjects.add(new RectagleObject(270, 410, 240, 30));
+        wallObjects.add(new RectagleObject(375, 10, 30, 115));
+        wallObjects.add(new RectagleObject(10, 10, 760, 10));
+        wallObjects.add(new RectagleObject(10, 10, 10, 760));
+        wallObjects.add(new RectagleObject(760, 10, 10, 760));
+        wallObjects.add(new RectagleObject(10, 760, 760, 10));
+        for (int i = 0; i < wallObjects.size(); i++) {
+            wallObjects.get(i).setColor(Color.BLUE);
+            wallObjects.get(i).draw();
 
         }
         //GhostDoor
 
+
     }
-    public void startGhostDoor(){
-        gameObjects.add(new RectagleObject(370, 305, 40, 30));
-        ghostDoor = gameObjects.getLast();
+
+    public void startGhostDoor() {
+        wallObjects.add(new RectagleObject(370, 305, 40, 30));
+        ghostDoor = wallObjects.getLast();
         ghostDoor.setColor(Color.WHITE);
         ghostDoor.fill();
     }
-    public void startText(){
+
+    public void startText() {
         scoreText = new Text(85, 345, String.valueOf(ballsRemaining));
         scoreText.setColor(Color.WHITE);
         scoreText.grow(30, 20);
@@ -434,6 +485,7 @@ public class Game implements KeyboardHandler {
         score.grow(30, 15);
         score.draw();
     }
+
     public void startGhosts() {
         for (int i = 0; i < 10; i++) {
             ghostMoveCheckers.add(new RectagleObject(375, 340, 30, 30));
@@ -444,18 +496,28 @@ public class Game implements KeyboardHandler {
             ghosts.get(i).draw();
         }
     }
+
     public void startBalls() {
         int l = 0;
         for (int j = 1; j < 22; j++) {
             for (int i = 0; i < 21; i++) {
-                balls[l] = new Ball(35 + (i * 35), 35 * j, 3, 3);
+                double rdm = Math.random() * 10;
+                if ((rdm > 9.5) && counterbolinhas <= 5) {
+                    balls[l] = new Ball(35 + (i * 35) - 4, 35 * j - 3, 15, 15);
+                    balls[l].setSpecial();
+                    balls[l].setColor(Color.GREEN);
+                    counterbolinhas++;
+                } else {
+                    balls[l] = new Ball(35 + (i * 35), 35 * j, 5, 5);
+                    balls[l].setColor(Color.YELLOW);
+                }
                 if (CollisionDetector.collisionDetector(playerObject, balls[l])) {
                     balls[l].setEaten(true);
                 }
                 RectagleObject centre = new RectagleObject(270, 305, 240, 135);
 
                 if (wallsCollisionDetector(balls[l]) && !CollisionDetector.collisionDetector(playerObject, balls[l]) && !CollisionDetector.collisionDetector(centre, balls[l])) {
-                    balls[l].setColor(Color.WHITE);
+
                     balls[l].fill();
                     ballsRemaining++;
                 }
@@ -464,6 +526,21 @@ public class Game implements KeyboardHandler {
         }
     }
 
+    public void losesLife() throws InterruptedException {
+        lifePlayer--;
+        playerObject = new PlayerObject(25, 25, 30, 30);
+        playerObject.draw();
+        moveChecker = new RectagleObject(25, 25, 30, 30);
+        for (GhostObject g : ghosts) {
+            g.delete();
+        }
+        ghosts.clear();
+        ghostMoveCheckers.clear();
+        startGhosts();
+        isGameOver = false;
+        startGame(125);
+
+    }
 
     @Override
     public void keyPressed(KeyboardEvent keyboardEvent) {
@@ -481,6 +558,10 @@ public class Game implements KeyboardHandler {
                     break;
                 case KeyboardEvent.KEY_DOWN:
                     currentKey = 3;
+                    break;
+                case KeyboardEvent.KEY_ENTER:
+                    isGameOver = false;
+                    closeMenu();
                     break;
             }
 
@@ -509,3 +590,5 @@ public class Game implements KeyboardHandler {
     }
 
 }
+
+

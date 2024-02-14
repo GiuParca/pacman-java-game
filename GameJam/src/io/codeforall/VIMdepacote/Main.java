@@ -4,9 +4,11 @@ package io.codeforall.VIMdepacote;
 // click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
 public class Main {
     public static void main(String[] args) throws InterruptedException {
+
         Game game = new Game();
         //game.startCD();
         //game.start();
+        game.startMenu();
         game.startGame(125);
 
 
