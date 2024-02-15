@@ -17,6 +17,8 @@ public class Game implements KeyboardHandler {
     private Text scoreText;
     private boolean isGameOver;
     private int currentKey = -1;
+    private int nextMove = -1;
+    private int speed = 5;
     private RectagleObject ghostDoor;
     private int ghostDoorCounterTimer;
     private LinkedList<GhostObject> ghosts = new LinkedList<>();
@@ -30,6 +32,8 @@ public class Game implements KeyboardHandler {
     private RectagleObject backGround = new RectagleObject(10, 10, 760, 760);
 
 
+    private RectagleObject ghostDoorMoveChecker = new RectagleObject(370, 305, 40, 30);
+
     public Game() {
 
         backGround.fill();
@@ -40,35 +44,37 @@ public class Game implements KeyboardHandler {
         startText();
         startGhostDoor();
         this.keyboardSetup();
+
     }
 
     public void moveGhost(int direction, int ghostIndex) {
         switch (direction) {
             case 0:
                 //for (int i = 0; i < 7; i++) {
-                ghosts.get(ghostIndex).translate(35, 0);
-                ghostMoveCheckers.get(ghostIndex).translate(35, 0);
+                ghosts.get(ghostIndex).translate(speed, 0);
+                ghostMoveCheckers.get(ghostIndex).translate(5, 0);
                 //}
                 break;
 
             case 1:
                 //for (int i = 0; i < 7; i++) {
-                ghosts.get(ghostIndex).translate(-35, 0);
-                ghostMoveCheckers.get(ghostIndex).translate(-35, 0);
+                ghosts.get(ghostIndex).translate(-speed, 0);
+                ghostMoveCheckers.get(ghostIndex).translate(-speed, 0);
                 //}
                 break;
             case 2:
                 //for (int i = 0; i < 7; i++) {
-                ghosts.get(ghostIndex).translate(0, -35);
-                ghostMoveCheckers.get(ghostIndex).translate(0, -35);
+                ghosts.get(ghostIndex).translate(0, -speed);
+                ghostMoveCheckers.get(ghostIndex).translate(0, -speed);
                 break;
             case 3:
                 //for (int i = 0; i < 7; i++) {
-                ghosts.get(ghostIndex).translate(0, 35);
-                ghostMoveCheckers.get(ghostIndex).translate(0, 35);
+                ghosts.get(ghostIndex).translate(0, speed);
+                ghostMoveCheckers.get(ghostIndex).translate(0, speed);
                 break;
         }
     }
+
     public boolean movePlayer(int directionToMove) {
 
         switch (directionToMove) {
@@ -77,8 +83,8 @@ public class Game implements KeyboardHandler {
                 moveChecker.translate(5, 0);
                 if (wallsCollisionDetector(moveChecker)) {
                     playerObject.setPicture("src/pacmanRight.png");
-                    playerObject.translate(35, 0);
-                    moveChecker.translate(30, 0);
+                    playerObject.translate(speed, 0);
+                    moveChecker.translate((speed - 5), 0);
                     for (Ball ball : balls) {
                         if (!ball.isEaten() && CollisionDetector.collisionDetector(playerObject, ball)) {
                             ball.delete();
@@ -111,8 +117,8 @@ public class Game implements KeyboardHandler {
                 moveChecker.translate(-5, 0);
                 if (wallsCollisionDetector(moveChecker)) {
                     playerObject.setPicture("src/pacmanLeft.png");
-                    playerObject.translate(-35, 0);
-                    moveChecker.translate(-30, 0);
+                    playerObject.translate(-speed, 0);
+                    moveChecker.translate(-(speed - 5), 0);
                     for (Ball ball : balls) {
                         if (!ball.isEaten() && CollisionDetector.collisionDetector(playerObject, ball)) {
                             ball.delete();
@@ -144,8 +150,8 @@ public class Game implements KeyboardHandler {
                 moveChecker.translate(0, -5);
                 if (wallsCollisionDetector(moveChecker)) {
                     playerObject.setPicture("src/pacmanUp.png");
-                    playerObject.translate(0, -35);
-                    moveChecker.translate(0, -30);
+                    playerObject.translate(0, -(speed));
+                    moveChecker.translate(0, -(speed - 5));
                     for (Ball ball : balls) {
                         if (!ball.isEaten() && CollisionDetector.collisionDetector(playerObject, ball)) {
                             ball.delete();
@@ -177,8 +183,8 @@ public class Game implements KeyboardHandler {
                 moveChecker.translate(0, 5);
                 if (wallsCollisionDetector(moveChecker)) {
                     playerObject.setPicture("src/pacmanDown.png");
-                    playerObject.translate(0, 35);
-                    moveChecker.translate(0, 30);
+                    playerObject.translate(0, speed);
+                    moveChecker.translate(0, (speed - 5));
                     for (Ball ball : balls) {
                         if (!ball.isEaten() && CollisionDetector.collisionDetector(playerObject, ball)) {
                             ball.delete();
@@ -210,23 +216,42 @@ public class Game implements KeyboardHandler {
         return false;
 
     }
+
     public void startGame(int speedMillis) throws InterruptedException {
 
         while (!isGameOver) {
 
             //If player move doesn't result in a true move (ex: hitting a wall), player maintains direction (currentKey is maintained)
-            if (!movePlayer(currentKey)) {
+            if (!movePlayer(nextMove)) {
                 movePlayer(currentKey);
-            }
+            }/*else {
+                movePlayer(nextMove);
+            }*/
 
             // GhostDoor opening logic
 
-            if (ghostDoorCounterTimer == 30) {
+            if (ghostDoorCounterTimer == 100) {
+
                 ghostDoor.translate(40, 0);
             }
-            if (ghostDoorCounterTimer == 34) {
-                ghostDoor.translate(-40, 0);
-                ghostDoorCounterTimer = 0;
+            if (ghostDoorCounterTimer > 250) {
+                boolean collision = false;
+
+                for (GhostObject ghost : ghosts) {
+                    System.out.println(CollisionDetector.collisionDetector(ghost, ghostDoorMoveChecker));
+                    if (CollisionDetector.collisionDetector(ghost, ghostDoorMoveChecker)) {
+                        collision = true;
+                        break;
+                    } else {
+                        System.out.println(CollisionDetector.collisionDetector(ghost, ghostDoorMoveChecker));
+                    }
+                }
+                if (!collision){
+                    ghostDoor.translate(-40, 0);
+                    ghostDoorCounterTimer = 0;
+                }
+
+
             }
 
 
@@ -293,6 +318,7 @@ public class Game implements KeyboardHandler {
                 }
 
             }
+
             ghostDoorCounterTimer++;
             Thread.sleep(speedMillis);
             for (GhostObject g : ghosts) {
@@ -300,9 +326,11 @@ public class Game implements KeyboardHandler {
             }
             playerObject.setPicture("src/pacmanClosed.png");
             Thread.sleep(speedMillis);
+
         }
 
     }
+
     public boolean wallsCollisionDetector(GameObjects object) {
         arrayCD = new Boolean[gameObjects.size()];
         for (int i = 0; i < gameObjects.size(); i++) {
@@ -313,6 +341,7 @@ public class Game implements KeyboardHandler {
 
 
     }
+
     public void keyboardSetup() {
 
         Keyboard keyboard = new Keyboard(this);
@@ -363,6 +392,7 @@ public class Game implements KeyboardHandler {
         keyboard.addEventListener(downArrowR);
 
     }
+
     public void startBackground() {
         gameObjects.add(new RectagleObject(60, 60, 100, 65));
         gameObjects.add(new RectagleObject(200, 60, 135, 65));
@@ -408,19 +438,22 @@ public class Game implements KeyboardHandler {
         gameObjects.add(new RectagleObject(10, 760, 760, 10));
         for (int i = 0; i < gameObjects.size(); i++) {
             gameObjects.get(i).setColor(Color.BLUE);
-            gameObjects.get(i).draw();
+            gameObjects.get(i).fill();
 
         }
         //GhostDoor
 
     }
-    public void startGhostDoor(){
+
+    public void startGhostDoor() {
         gameObjects.add(new RectagleObject(370, 305, 40, 30));
         ghostDoor = gameObjects.getLast();
         ghostDoor.setColor(Color.WHITE);
         ghostDoor.fill();
+
     }
-    public void startText(){
+
+    public void startText() {
         scoreText = new Text(85, 345, String.valueOf(ballsRemaining));
         scoreText.setColor(Color.WHITE);
         scoreText.grow(30, 20);
@@ -434,6 +467,7 @@ public class Game implements KeyboardHandler {
         score.grow(30, 15);
         score.draw();
     }
+
     public void startGhosts() {
         for (int i = 0; i < 10; i++) {
             ghostMoveCheckers.add(new RectagleObject(375, 340, 30, 30));
@@ -444,6 +478,7 @@ public class Game implements KeyboardHandler {
             ghosts.get(i).draw();
         }
     }
+
     public void startBalls() {
         int l = 0;
         for (int j = 1; j < 22; j++) {
@@ -472,15 +507,19 @@ public class Game implements KeyboardHandler {
             switch (keyboardEvent.getKey()) {
                 case KeyboardEvent.KEY_RIGHT:
                     currentKey = 0;
+                    nextMove = 0;
                     break;
                 case KeyboardEvent.KEY_LEFT:
                     currentKey = 1;
+                    nextMove = 1;
                     break;
                 case KeyboardEvent.KEY_UP:
                     currentKey = 2;
+                    nextMove = 2;
                     break;
                 case KeyboardEvent.KEY_DOWN:
                     currentKey = 3;
+                    nextMove = 3;
                     break;
             }
 
@@ -493,15 +532,19 @@ public class Game implements KeyboardHandler {
             switch (keyboardEvent.getKey()) {
                 case KeyboardEvent.KEY_RIGHT:
                     currentKey = 0;
+                    nextMove = 0;
                     break;
                 case KeyboardEvent.KEY_LEFT:
                     currentKey = 1;
+                    nextMove = 1;
                     break;
                 case KeyboardEvent.KEY_UP:
                     currentKey = 2;
+                    nextMove = 2;
                     break;
                 case KeyboardEvent.KEY_DOWN:
                     currentKey = 3;
+                    nextMove = 3;
                     break;
             }
 

@@ -7,7 +7,7 @@ public class Main {
         Game game = new Game();
         //game.startCD();
         //game.start();
-        game.startGame(125);
+        game.startGame(10);
 
 
     }
