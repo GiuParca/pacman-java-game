@@ -28,8 +28,10 @@ public class Game implements KeyboardHandler {
     Picture pacman2;
     Picture pacman3;
     private int ghostDoorCounterTimer;
+
+    Sound sound = new Sound();
     private Rectangle menuBackGround = new Rectangle(10, 10, 760, 760);
-    private Picture button = new Picture(334, 334, "src/img_1.png");
+    private Picture button = new Picture(10, 10, "src/startGameImg.png");
     private LinkedList<GhostObject> ghosts = new LinkedList<>();
     private LinkedList<RectagleObject> ghostMoveCheckers = new LinkedList<>();
     //private RectangleObject[] gameObjects;
@@ -92,7 +94,7 @@ public class Game implements KeyboardHandler {
                 //for (int i = 0; i < 7; i++) {
                 moveChecker.translate(5, 0);
                 if (wallsCollisionDetector(moveChecker)) {
-                    playerObject.setPicture("src/pacmanRight.png");
+                    playerObject.setPicture("src/io/codeforall/VIMdepacote/playerRight.png");
                     playerObject.translate(35, 0);
                     moveChecker.translate(30, 0);
                     ballCollision();
@@ -113,7 +115,7 @@ public class Game implements KeyboardHandler {
                 //for (int i = 0; i < 7; i++) {
                 moveChecker.translate(-5, 0);
                 if (wallsCollisionDetector(moveChecker)) {
-                    playerObject.setPicture("src/pacmanLeft.png");
+                    playerObject.setPicture("src/io/codeforall/VIMdepacote/playerLeft.png");
                     playerObject.translate(-35, 0);
                     moveChecker.translate(-30, 0);
                     ballCollision();
@@ -133,7 +135,7 @@ public class Game implements KeyboardHandler {
                 //for (int i = 0; i < 7; i++) {
                 moveChecker.translate(0, -5);
                 if (wallsCollisionDetector(moveChecker)) {
-                    playerObject.setPicture("src/pacmanUp.png");
+                    playerObject.setPicture("src/io/codeforall/VIMdepacote/playerUp.png");
                     playerObject.translate(0, -35);
                     moveChecker.translate(0, -30);
                     ballCollision();
@@ -153,7 +155,7 @@ public class Game implements KeyboardHandler {
                 //for (int i = 0; i < 7; i++) {
                 moveChecker.translate(0, 5);
                 if (wallsCollisionDetector(moveChecker)) {
-                    playerObject.setPicture("src/pacmanDown.png");
+                    playerObject.setPicture("src/io/codeforall/VIMdepacote/playerDown.png");
                     playerObject.translate(0, 35);
                     moveChecker.translate(0, 30);
                     ballCollision();
@@ -195,6 +197,7 @@ public class Game implements KeyboardHandler {
 
         menuBackGround.setColor(Color.BLACK);
         menuBackGround.fill();
+
 
         button.draw();
 
@@ -316,7 +319,25 @@ public class Game implements KeyboardHandler {
             for (GhostObject g : ghosts) {
                 g.setPicture("src/Untitled-2.png");
             }
-            playerObject.setPicture("src/pacmanClosed.png");
+            /*switch (currentKey) {
+                case 0:
+                    playerObject.setPicture("src/io/codeforall/VIMdepacote/playerRightStop.png");
+                    Thread.sleep(speedMillis);
+                    break;
+                case 1:
+                    playerObject.setPicture("src/io/codeforall/VIMdepacote/playerLeftStop.png");
+                    Thread.sleep(speedMillis);
+                    break;
+                case 2:
+                    playerObject.setPicture("src/io/codeforall/VIMdepacote/playerUpStop.png");
+                    Thread.sleep(speedMillis);
+                    break;
+                case 3:
+                    playerObject.setPicture("src/io/codeforall/VIMdepacote/playerDownStop.png");
+                    Thread.sleep(speedMillis);
+                    break;
+            }*/
+
             Thread.sleep(speedMillis);
         }
 
@@ -488,17 +509,13 @@ public class Game implements KeyboardHandler {
         score.setColor(Color.WHITE);
         score.grow(30, 15);
         score.draw();
-        scoreTextLives = new Text(675, 345, String.valueOf(lifePlayer));
-        scoreTextLives.setColor(Color.WHITE);
-        scoreTextLives.grow(30, 20);
-        scoreTextLives.draw();
-        Text right = new Text(675, 300, "LIVES");
+        Text right = new Text(675, 290, "LIVES");
         right.setColor(Color.WHITE);
         right.grow(20, 15);
         right.draw();
-        pacman1 = new Picture(650, 390, "src/pacman-png-25195.png");
-        pacman2 = new Picture(680, 390, "src/pacman-png-25195.png");
-        pacman3 = new Picture(710, 390, "src/pacman-png-25195.png");
+        pacman1 = new Picture(645, 345, "src/io/codeforall/VIMdepacote/playerDown.png");
+        pacman2 = new Picture(675, 345, "src/io/codeforall/VIMdepacote/playerDown.png");
+        pacman3 = new Picture(705, 345, "src/io/codeforall/VIMdepacote/playerDown.png");
 
         pacman1.draw();
         pacman2.draw();
@@ -563,15 +580,12 @@ public class Game implements KeyboardHandler {
 
         if (lifePlayer == 2) {
             pacman1.delete();
-            System.out.println("Tchau");
         }
         if (lifePlayer == 1) {
             pacman2.delete();
-            System.out.println("oi");
         }
         if (lifePlayer == 0) {
             pacman3.delete();
-            System.out.println("132");
         }
 
         startGame(125);

@@ -10,7 +10,7 @@ public class PlayerObject extends GameObjects {
 
     public PlayerObject(double initX, double initY, double width, double height) {
         super();
-        this.picture = new Picture(initX, initY,"src/pacman-png-25195.png");
+        this.picture = new Picture(initX, initY,"src/io/codeforall/VIMdepacote/playerDown.png");
         double right = picture.getX() + picture.getWidth();
         double bottom = picture.getY() + picture.getHeight();
         double left = picture.getX();

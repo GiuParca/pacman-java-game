@@ -6,6 +6,7 @@ public class Main {
     public static void main(String[] args) throws InterruptedException {
         Sound sound = new Sound();
         sound.play();
+        //sound.play();
         Game game = new Game();
         //game.startCD();
         //game.start();
