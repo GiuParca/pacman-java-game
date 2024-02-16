@@ -18,11 +18,15 @@ public class Game implements KeyboardHandler {
     private Ball[] balls = new Ball[441];
     private int ballsRemaining;
     private Text scoreText;
+    private Text scoreTextLives;
     private boolean isGameOver;
     private int currentKey = -1;
     private RectagleObject ghostDoor;
     private int startGameKey = 0;
     private int lifePlayer = 3;
+    Picture pacman1;
+    Picture pacman2;
+    Picture pacman3;
     private int ghostDoorCounterTimer;
     private Rectangle menuBackGround = new Rectangle(10, 10, 760, 760);
     private Picture button = new Picture(334, 334, "src/img_1.png");
@@ -484,7 +488,24 @@ public class Game implements KeyboardHandler {
         score.setColor(Color.WHITE);
         score.grow(30, 15);
         score.draw();
+        scoreTextLives = new Text(675, 345, String.valueOf(lifePlayer));
+        scoreTextLives.setColor(Color.WHITE);
+        scoreTextLives.grow(30, 20);
+        scoreTextLives.draw();
+        Text right = new Text(675, 300, "LIVES");
+        right.setColor(Color.WHITE);
+        right.grow(20, 15);
+        right.draw();
+        pacman1 = new Picture(650, 390, "src/pacman-png-25195.png");
+        pacman2 = new Picture(680, 390, "src/pacman-png-25195.png");
+        pacman3 = new Picture(710, 390, "src/pacman-png-25195.png");
+
+        pacman1.draw();
+        pacman2.draw();
+        pacman3.draw();
+
     }
+
 
     public void startGhosts() {
         for (int i = 0; i < 10; i++) {
@@ -533,13 +554,27 @@ public class Game implements KeyboardHandler {
         moveChecker = new RectagleObject(25, 25, 30, 30);
         for (GhostObject g : ghosts) {
             g.delete();
+            scoreTextLives.setText(String.valueOf(lifePlayer));
         }
         ghosts.clear();
         ghostMoveCheckers.clear();
         startGhosts();
         isGameOver = false;
-        startGame(125);
 
+        if (lifePlayer == 2) {
+            pacman1.delete();
+            System.out.println("Tchau");
+        }
+        if (lifePlayer == 1) {
+            pacman2.delete();
+            System.out.println("oi");
+        }
+        if (lifePlayer == 0) {
+            pacman3.delete();
+            System.out.println("132");
+        }
+
+        startGame(125);
     }
 
     @Override
