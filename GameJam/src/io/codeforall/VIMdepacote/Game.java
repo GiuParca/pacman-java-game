@@ -436,6 +436,7 @@ public class Game implements KeyboardHandler {
         gameObjects.add(new RectagleObject(10, 10, 10, 760));
         gameObjects.add(new RectagleObject(760, 10, 10, 760));
         gameObjects.add(new RectagleObject(10, 760, 760, 10));
+
         for (int i = 0; i < gameObjects.size(); i++) {
             gameObjects.get(i).setColor(Color.BLUE);
             gameObjects.get(i).fill();
