@@ -1,42 +1,52 @@
 package io.codeforall.VIMdepacote;
+
 import javax.sound.sampled.*;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
 
 public class Sound {
-    private Clip jaws;
+    private Clip clip;
+    URL songUrl;
 
-    public Sound() {
+    public Sound(String filePath) {
+        songUrl = getClass().getResource(filePath);
+
         try {
-            File soundFile = new File("src/io/codeforall/VIMdepacote/PacmanMusic.wav");
-            AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(soundFile);
-            jaws = AudioSystem.getClip();
-            jaws.open(audioInputStream);
-
-        } catch (UnsupportedAudioFileException | IOException | LineUnavailableException e) {
-            e.printStackTrace();
-        }
-    }
-    public void play() {
-        if (jaws != null) {
-            jaws.setFramePosition(0);
-            jaws.start();
-        }
-    }
+            AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(songUrl);
+            System.out.println(audioInputStream);
+            clip = AudioSystem.getClip();
+            clip.open(audioInputStream);
+        } catch (UnsupportedAudioFileException | LineUnavailableException e) {
+            throw new RuntimeException(e);
 
 
-    public void stop() {
-        if (jaws != null) {
-            jaws.stop();
-        }
-    }
-    public void close() {
-        if (jaws != null) {
-            jaws.close();
-        }
-    }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }}
 
-}
+
+        public void play() {
+            if (clip != null) {
+                clip.setFramePosition(0);
+                clip.start();
+            }
+        }
+
+
+        public void stop () {
+            if (clip != null) {
+                clip.stop();
+            }
+        }
+        public void close () {
+            if (clip != null) {
+                clip.close();
+            }
+        }
+
+    }
 
 
 

@@ -10,7 +10,7 @@ public class PlayerObject extends GameObjects {
 
     public PlayerObject(double initX, double initY, double width, double height) {
         super();
-        this.picture = new Picture(initX, initY,"src/io/codeforall/VIMdepacote/playerDown.png");
+        this.picture = new Picture(initX, initY,Prefix.prefix +"playerDown.png");
         double right = picture.getX() + picture.getWidth();
         double bottom = picture.getY() + picture.getHeight();
         double left = picture.getX();
@@ -29,6 +29,10 @@ public class PlayerObject extends GameObjects {
         this.picture.load(picturePath);
     }
 
+
+    public void delete(){
+        picture.delete();
+    }
 
     public Picture getPicture() {
         return this.picture;

@@ -38,6 +38,10 @@ public class RectagleObject extends GameObjects {
         this.rectangle.setColor(color);
     }
 
+    public void delete(){
+        this.rectangle.delete();
+    }
+
 
     public Rectangle getRectangle() {
         return this.rectangle;
