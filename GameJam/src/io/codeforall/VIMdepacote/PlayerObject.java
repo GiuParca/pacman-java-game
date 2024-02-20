@@ -10,7 +10,7 @@ public class PlayerObject extends GameObjects {
 
     public PlayerObject(double initX, double initY, double width, double height) {
         super();
-        this.picture = new Picture(initX, initY,"src/pacman-png-25195.png");
+        this.picture = new Picture(initX, initY,Prefix.prefix +"playerDown.png");
         double right = picture.getX() + picture.getWidth();
         double bottom = picture.getY() + picture.getHeight();
         double left = picture.getX();
@@ -30,6 +30,10 @@ public class PlayerObject extends GameObjects {
     }
 
 
+    public void delete(){
+        picture.delete();
+    }
+
     public Picture getPicture() {
         return this.picture;
     }
@@ -43,5 +47,7 @@ public class PlayerObject extends GameObjects {
         setObjectBounds(right, up, left, bottom);
 
     }
+
+
 
 }

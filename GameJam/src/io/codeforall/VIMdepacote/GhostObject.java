@@ -8,20 +8,34 @@ public class GhostObject extends GameObjects {
 
     private Picture picture;
     int lastMove;
+    private boolean isEatable;
+
 
 
     public GhostObject(double initX, double initY, double width, double height) {
         super();
-        this.picture = new Picture(initX, initY,"src/Untitled-1.png");
+        this.picture = new Picture(initX, initY,"resources/Untitled-1.png");
         double right = picture.getX() + picture.getWidth();
         double bottom = picture.getY() + picture.getHeight();
         double left = picture.getX();
         double up = picture.getY();
         setObjectBounds(right, up, left, bottom);
-        lastMove = 2;
+        lastMove = 0;
 
     }
 
+
+    public boolean isEatable() {
+        return isEatable;
+    }
+
+    public void setEatable(boolean eatable) {
+        isEatable = eatable;
+    }
+
+    public void delete(){
+        this.picture.delete();
+}
 
     public void draw() {
         this.picture.draw();
