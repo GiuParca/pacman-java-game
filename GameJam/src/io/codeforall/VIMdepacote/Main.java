@@ -10,10 +10,7 @@ import java.io.IOException;
 public class Main {
     public static void main(String[] args) throws InterruptedException, UnsupportedAudioFileException, LineUnavailableException, IOException {
 
-        //sound.play();
         Game game = new Game();
-        //game.startCD();
-        //game.start();
         game.startMenu();
         game.startGame(10);
 
